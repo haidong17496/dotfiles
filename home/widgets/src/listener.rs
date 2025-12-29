@@ -5,11 +5,14 @@ use hyprland::prelude::*;
 use iced::futures::SinkExt;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
+use tokio::fs; 
 use regex::Regex;
 use std::time::Duration;
 
 use crate::island::Message;
+use crate::media::{self, MediaInfo}; 
 
+// --- HYPRLAND WORKSPACE HELPER ---
 async fn fetch_and_sort() -> Option<(Vec<i32>, Vec<i32>)> {
     let mut monitors = Monitors::get_async().await.ok()?.to_vec();
     monitors.sort_by(|a, b| a.x.cmp(&b.x));
@@ -31,8 +34,10 @@ async fn fetch_and_sort() -> Option<(Vec<i32>, Vec<i32>)> {
     Some((left, right))
 }
 
+// --- HYPRLAND LISTENER ---
 pub fn listen_to_hyprland() -> impl iced::futures::Stream<Item = Message> {
     iced::stream::channel(100, |mut output| async move {
+        // Initial Fetch
         if let Some((l, r)) = fetch_and_sort().await { 
             let _ = output.send(Message::WorkspaceDataUpdated { left: l, right: r }).await; 
         }
@@ -88,16 +93,14 @@ pub fn listen_to_hyprland() -> impl iced::futures::Stream<Item = Message> {
     })
 }
 
-// --- VOLUME LISTENER (Fixed: Debounce logic) ---
+// --- VOLUME LISTENER (Debounced) ---
 pub fn listen_to_volume() -> impl iced::futures::Stream<Item = Message> {
     iced::stream::channel(10, |mut output| async move {
-        // State tracking to prevent OSD showing on Play/Pause
         let mut last_known_level = -1.0;
         let mut last_known_muted = false;
 
         let re_vol = Regex::new(r"Volume:\s+(\d+\.\d+)").unwrap();
 
-        // Helper function to fetch and parse current volume
         async fn get_wpctl_status(re: &Regex) -> Option<(f32, bool)> {
             let wp_output = Command::new("wpctl")
                 .args(["get-volume", "@DEFAULT_AUDIO_SINK@"])
@@ -106,10 +109,6 @@ pub fn listen_to_volume() -> impl iced::futures::Stream<Item = Message> {
                 .ok()?;
             
             let out_str = String::from_utf8_lossy(&wp_output.stdout);
-            
-            // Output format examples:
-            // "Volume: 0.40"
-            // "Volume: 0.40 [MUTED]"
             
             if let Some(caps) = re.captures(&out_str) {
                 if let Some(m) = caps.get(1) {
@@ -123,13 +122,12 @@ pub fn listen_to_volume() -> impl iced::futures::Stream<Item = Message> {
             None
         }
 
-        // 1. Initial Fetch (Set baseline so we don't flash on startup/first action)
+        // Initial fetch
         if let Some((lvl, muted)) = get_wpctl_status(&re_vol).await {
             last_known_level = lvl;
             last_known_muted = muted;
         }
 
-        // 2. Start Listener
         let mut child = match Command::new("pactl")
             .arg("subscribe")
             .stdout(std::process::Stdio::piped())
@@ -146,14 +144,8 @@ pub fn listen_to_volume() -> impl iced::futures::Stream<Item = Message> {
         let mut reader = BufReader::new(stdout).lines();
 
         while let Ok(Some(line)) = reader.next_line().await {
-            // "Event 'change' on sink #49"
             if line.contains("sink") && line.contains("change") {
-                
-                // Check actual volume
                 if let Some((level, is_muted)) = get_wpctl_status(&re_vol).await {
-                    
-                    // --- CRITICAL FIX ---
-                    // Only send update if volume/mute CHANGED
                     let level_changed = (level - last_known_level).abs() > 0.001;
                     let mute_changed = is_muted != last_known_muted;
 
@@ -161,9 +153,9 @@ pub fn listen_to_volume() -> impl iced::futures::Stream<Item = Message> {
                         last_known_level = level;
                         last_known_muted = is_muted;
 
-                        let icon = if is_muted || level <= 0.0 { "\u{f026}" } // Mute
-                                   else if level < 0.5 { "\u{f027}" } // Low
-                                   else { "\u{f028}" }; // High
+                        let icon = if is_muted || level <= 0.0 { "\u{f026}" } 
+                                   else if level < 0.5 { "\u{f027}" } 
+                                   else { "\u{f028}" }; 
                         
                         let _ = output.send(Message::OsdUpdate { 
                             icon: icon.to_string(), 
@@ -176,27 +168,39 @@ pub fn listen_to_volume() -> impl iced::futures::Stream<Item = Message> {
     })
 }
 
-// --- BRIGHTNESS LISTENER ---
+// --- BRIGHTNESS LISTENER (Optimized File IO) ---
 pub fn listen_to_brightness() -> impl iced::futures::Stream<Item = Message> {
     iced::stream::channel(10, |mut output| async move {
+        let mut backlight_path = None;
+        if let Ok(mut entries) = fs::read_dir("/sys/class/backlight").await {
+            while let Ok(Some(entry)) = entries.next_entry().await {
+                backlight_path = Some(entry.path());
+                break;
+            }
+        }
+
+        let path = match backlight_path {
+            Some(p) => p,
+            None => return, // No backlight found
+        };
+
+        let current_path = path.join("brightness");
+        let max_path = path.join("max_brightness");
+
         let mut last_brightness = -1.0;
 
         loop {
-            let current = Command::new("brightnessctl").arg("g").output().await;
-            let max = Command::new("brightnessctl").arg("m").output().await;
+            let current_res = fs::read_to_string(&current_path).await;
+            let max_res = fs::read_to_string(&max_path).await;
 
-            if let (Ok(c), Ok(m)) = (current, max) {
-                let c_str = String::from_utf8_lossy(&c.stdout).trim().to_string();
-                let m_str = String::from_utf8_lossy(&m.stdout).trim().to_string();
-
-                if let (Ok(c_val), Ok(m_val)) = (c_str.parse::<f32>(), m_str.parse::<f32>()) {
-                    let level = (c_val / m_val).max(0.0).min(1.0);
+            if let (Ok(c_str), Ok(m_str)) = (current_res, max_res) {
+                if let (Ok(curr), Ok(max)) = (c_str.trim().parse::<f32>(), m_str.trim().parse::<f32>()) {
+                    let level = (curr / max).max(0.0).min(1.0);
 
                     if (level - last_brightness).abs() > 0.01 {
-                        if last_brightness != -1.0 { 
-                            let icon = "\u{f185}"; 
+                        if last_brightness != -1.0 {
                             let _ = output.send(Message::OsdUpdate { 
-                                icon: icon.to_string(), 
+                                icon: "\u{f185}".to_string(), 
                                 level 
                             }).await;
                         }
@@ -205,6 +209,83 @@ pub fn listen_to_brightness() -> impl iced::futures::Stream<Item = Message> {
                 }
             }
             tokio::time::sleep(Duration::from_millis(300)).await;
+        }
+    })
+}
+
+// --- BATTERY LISTENER (Optimized File IO) ---
+pub fn listen_to_battery() -> impl iced::futures::Stream<Item = Message> {
+    iced::stream::channel(10, |mut output| async move {
+        let mut bat_path = None;
+        if let Ok(mut entries) = fs::read_dir("/sys/class/power_supply").await {
+            while let Ok(Some(entry)) = entries.next_entry().await {
+                let name = entry.file_name().to_string_lossy().to_string();
+                if name.starts_with("BAT") || name.starts_with("CMB") {
+                    bat_path = Some(format!("/sys/class/power_supply/{}", name));
+                    break;
+                }
+            }
+        }
+        
+        let path = bat_path.unwrap_or_else(|| "/sys/class/power_supply/BAT0".to_string());
+
+        loop {
+            let cap_path = format!("{}/capacity", path);
+            let status_path = format!("{}/status", path);
+
+            let capacity = fs::read_to_string(&cap_path)
+                .await
+                .unwrap_or("100".to_string())
+                .trim()
+                .parse::<f32>()
+                .unwrap_or(100.0);
+
+            let status = fs::read_to_string(&status_path)
+                .await
+                .unwrap_or("Discharging".to_string())
+                .trim()
+                .to_string();
+
+            let is_charging = status == "Charging" || status == "Full" || status == "Not charging";
+
+            let _ = output.send(Message::BatteryUpdate { 
+                level: capacity, 
+                is_charging 
+            }).await;
+
+            tokio::time::sleep(Duration::from_secs(3)).await;
+        }
+    })
+}
+
+// --- MEDIA LISTENER (Robust & Debounced) ---
+pub fn listen_to_media() -> impl iced::futures::Stream<Item = Message> {
+    iced::stream::channel(10, |mut output| async move {
+        let mut last_title = String::new();
+        let mut last_playing = false;
+
+        loop {
+            // Get current media status
+            let info = tokio::task::spawn_blocking(|| media::get_active_media())
+                .await
+                .unwrap_or(None)
+                .unwrap_or(MediaInfo::default());
+
+            // Check if significant state changed
+            let title_changed = info.title != last_title;
+            let playing_changed = info.is_playing != last_playing;
+            
+            // Logic:
+            // 1. If Playing: Always update (need to update progress bar timestamp, etc)
+            // 2. If Paused/Stopped: Only update if state actually changed (prevents flicker)
+            if info.is_playing || title_changed || playing_changed {
+                last_title = info.title.clone();
+                last_playing = info.is_playing;
+                
+                let _ = output.send(Message::MediaUpdate(Some(info))).await;
+            }
+
+            tokio::time::sleep(Duration::from_secs(2)).await;
         }
     })
 }

@@ -10,7 +10,7 @@ impl Default for Spring {
         Self {
             current: 0.0,
             target: 0.0,
-            speed: 0.15, // A good snappy feel
+            speed: 0.15, 
         }
     }
 }
@@ -29,12 +29,15 @@ impl Spring {
     }
 
     pub fn update(&mut self, _dt: f32) -> bool {
-        self.current = self.current + (self.target - self.current) * self.speed;
+        let diff = self.target - self.current;
 
-        if (self.current - self.target).abs() < 0.5 {
+        // PERF FIX: Snap to target when close to stop the animation loop
+        if diff.abs() < 0.5 {
             self.current = self.target;
-            return false; // Stopped
+            return false; // Animation stopped
         }
-        true // Still moving
+
+        self.current = self.current + diff * self.speed;
+        true // Animation continues
     }
 }

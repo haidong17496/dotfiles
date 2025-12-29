@@ -1,16 +1,18 @@
 use iced::Color;
 
 // --- WINDOW SETTINGS ---
+// Increased to allow the notification list to expand downwards without clipping.
+// The actual visible area is determined by the input region logic, so this is safe.
 pub const WINDOW_WIDTH: i32 = 400;
-pub const WINDOW_HEIGHT: i32 = 150;
+pub const WINDOW_HEIGHT: i32 = 600; 
 
 // --- SIZES ---
 pub mod size {
     pub const DASHBOARD_HEIGHT: f32 = 38.0;
     pub const MUSIC_HEIGHT: f32 = 120.0;
     pub const NOTIF_HEIGHT: f32 = 90.0;
+    pub const NOTIF_CENTER_HEIGHT: f32 = 320.0; // New: Expanded list height
     
-    // Adjusted OSD Dimensions
     pub const OSD_HEIGHT: f32 = 40.0; 
     pub const OSD_WIDTH: f32 = 250.0; 
 

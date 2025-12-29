@@ -1,5 +1,4 @@
-// ... (imports same)
-use iced::widget::{button, column, container, row, text, canvas::{self, Canvas, Geometry, Path, Frame}};
+use iced::widget::{button, column, container, row, text, canvas::{self, Canvas, Geometry, Path}};
 use iced::widget::text::LineHeight;
 use iced::{Background, Color, Element, Length, Padding, Point, Size, Rectangle, Renderer};
 use iced::alignment::{Horizontal, Vertical};
@@ -9,52 +8,59 @@ use iced::mouse;
 use crate::island::{DynamicIsland, Message};
 use crate::config;
 
-// ... (Marquee and ProgressBar structs and impls remain EXACTLY the same) ...
-#[derive(Debug)]
-struct Marquee {
+// --- MARQUEE WIDGET ---
+struct Marquee<'a> {
     text: String,
     offset: f32,
+    cache: &'a canvas::Cache,
 }
 
-impl canvas::Program<Message> for Marquee {
+impl<'a> canvas::Program<Message> for Marquee<'a> {
     type State = ();
+
     fn draw(&self, _state: &Self::State, renderer: &Renderer, _theme: &iced::Theme, bounds: Rectangle, _cursor: mouse::Cursor) -> Vec<Geometry> {
-        let mut frame = Frame::new(renderer, bounds.size());
-        let text_element = canvas::Text {
-            content: self.text.clone(),
-            position: Point::new(self.offset, bounds.height / 2.0),
-            color: config::WHITE,
-            size: config::FONT_TITLE.into(),
-            line_height: LineHeight::Relative(1.0),
-            font: Font { weight: Weight::Bold, ..Default::default() },
-            horizontal_alignment: Horizontal::Left,
-            vertical_alignment: Vertical::Center,
-            ..canvas::Text::default()
-        };
-        frame.fill_text(text_element);
-        vec![frame.into_geometry()]
+        let geometry = self.cache.draw(renderer, bounds.size(), |frame| {
+            let text_element = canvas::Text {
+                content: self.text.clone(),
+                position: Point::new(self.offset, frame.height() / 2.0),
+                color: config::WHITE,
+                size: config::FONT_TITLE.into(),
+                line_height: LineHeight::Relative(1.0),
+                font: Font { weight: Weight::Bold, ..Default::default() },
+                horizontal_alignment: Horizontal::Left,
+                vertical_alignment: Vertical::Center,
+                ..canvas::Text::default()
+            };
+            frame.fill_text(text_element);
+        });
+        vec![geometry]
     }
 }
 
-#[derive(Debug)]
-struct ProgressBar {
+// --- PROGRESS BAR WIDGET ---
+struct ProgressBar<'a> {
     progress: f32,
+    cache: &'a canvas::Cache,
 }
-impl ProgressBar { fn new(progress: f32) -> Self { Self { progress } } }
 
-impl canvas::Program<Message> for ProgressBar {
+impl<'a> canvas::Program<Message> for ProgressBar<'a> {
     type State = ();
+
     fn draw(&self, _state: &Self::State, renderer: &Renderer, _theme: &iced::Theme, bounds: Rectangle, _cursor: mouse::Cursor) -> Vec<Geometry> {
-        let mut frame = Frame::new(renderer, bounds.size());
-        let bar_height = 6.0; 
-        let y_offset = (bounds.height - bar_height) / 2.0;
-        let bg_bar = Path::rectangle(Point::new(0.0, y_offset), Size::new(bounds.width, bar_height));
-        frame.fill(&bg_bar, config::ACCENT);
-        let progress_width = bounds.width * (self.progress / 100.0);
-        let fg_bar = Path::rectangle(Point::new(0.0, y_offset), Size::new(progress_width, bar_height));
-        frame.fill(&fg_bar, config::WHITE);
-        vec![frame.into_geometry()]
+        let geometry = self.cache.draw(renderer, bounds.size(), |frame| {
+            let bar_height = 6.0; 
+            let y_offset = (frame.height() - bar_height) / 2.0;
+            
+            let bg_bar = Path::rectangle(Point::new(0.0, y_offset), Size::new(frame.width(), bar_height));
+            frame.fill(&bg_bar, config::ACCENT);
+            
+            let progress_width = frame.width() * (self.progress / 100.0);
+            let fg_bar = Path::rectangle(Point::new(0.0, y_offset), Size::new(progress_width, bar_height));
+            frame.fill(&fg_bar, config::WHITE);
+        });
+        vec![geometry]
     }
+
     fn update(&self, _state: &mut Self::State, event: canvas::Event, bounds: Rectangle, cursor: mouse::Cursor) -> (canvas::event::Status, Option<Message>) {
         if let canvas::Event::Mouse(mouse::Event::ButtonPressed(mouse::Button::Left)) = event {
             if let Some(position) = cursor.position_in(bounds) {
@@ -64,6 +70,7 @@ impl canvas::Program<Message> for ProgressBar {
         }
         (canvas::event::Status::Ignored, None)
     }
+
     fn mouse_interaction(&self, _state: &Self::State, bounds: Rectangle, cursor: mouse::Cursor) -> mouse::Interaction {
         if cursor.is_over(bounds) { mouse::Interaction::Pointer } else { mouse::Interaction::default() }
     }
@@ -91,7 +98,11 @@ pub fn view<'a>(app: &'a DynamicIsland) -> Element<'a, Message> {
         let text_height = Length::Fixed(config::FONT_TITLE as f32 + 6.0); 
 
         if app.width.current >= config::size::MAX_WIDTH - 5.0 {
-            Canvas::new(Marquee { text: title_clean, offset: app.marquee_offset })
+            Canvas::new(Marquee { 
+                text: title_clean, 
+                offset: app.marquee_offset,
+                cache: &app.marquee_cache 
+            })
             .width(Length::Fill).height(text_height).into()
         } else {
             container(
@@ -127,9 +138,11 @@ pub fn view<'a>(app: &'a DynamicIsland) -> Element<'a, Message> {
         media_btn("\u{f051}", 18, Message::SkipNext),
     ].spacing(15).align_y(Vertical::Center);
 
-    // --- FIX: Use music_progress ---
-    let progress_bar = Canvas::new(ProgressBar::new(app.music_progress.current))
-        .width(Length::Fill).height(Length::Fixed(20.0));
+    let progress_bar = Canvas::new(ProgressBar { 
+        progress: app.music_progress.current,
+        cache: &app.progress_cache 
+    })
+    .width(Length::Fill).height(Length::Fixed(20.0));
 
     container(row![
         album_art, 

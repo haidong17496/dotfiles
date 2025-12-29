@@ -1,7 +1,7 @@
 pub mod dashboard;
 pub mod music;
 pub mod notification;
-pub mod osd; // Ensure osd module exists
+pub mod osd; 
 
 use iced::widget::{button, container};
 use iced::{Background, Color, Element, Length, Padding, Shadow, Vector};
@@ -15,7 +15,8 @@ pub fn root<'a>(app: &'a DynamicIsland) -> Element<'a, Message> {
         IslandMode::Dashboard => dashboard::view(app),
         IslandMode::Music => music::view(app),
         IslandMode::Notification => notification::view(app),
-        IslandMode::Osd => osd::view(app), // <--- FIXED HERE
+        IslandMode::Osd => osd::view(app), 
+        IslandMode::NotificationCenter => notification::view_center(app), // New Route
     };
 
     let current_w = app.width.current.round();
@@ -31,7 +32,8 @@ pub fn root<'a>(app: &'a DynamicIsland) -> Element<'a, Message> {
     let island = button(clipped_content)
         .on_press(Message::CycleMode)
         .width(Length::Fixed(current_w))   
-        .height(Length::Fixed(current_h)) 
+        .height(Length::Fixed(current_h))
+        .padding(0) 
         .style(move |_, _| button::Style {
             background: Some(Background::Color(config::BG)),
             text_color: config::WHITE,

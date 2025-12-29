@@ -4,7 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-iced = { version = "0.13", features = ["canvas", "tokio", "debug"] }
+# REMOVED "debug" from features list
+iced = { version = "0.13", features = ["canvas", "tokio"] } 
 iced_layershell = "0.13" 
 hyprland = { version = "0.4.0-beta.3" }
 tokio = { version = "1", features = ["full"] }
@@ -13,3 +14,10 @@ mpris = "2.0"
 zbus = { version = "4", features = ["tokio"] }
 serde = { version = "1", features = ["derive"] }
 regex = "1"
+
+# --- NEW: Optimization Settings ---
+[profile.release]
+opt-level = 3       # Maximize speed
+lto = true          # Link Time Optimization (smaller, faster binary)
+codegen-units = 1   # Slower compile time, faster runtime code
+strip = true        # Remove symbols to save space
