@@ -5,6 +5,8 @@
         ./browsers.nix
         ./neovim.nix
         ./git.nix
+        ./yazi.nix
+        ./bluetooth.nix
     ];
 
     home.packages = with pkgs; [

@@ -12,9 +12,17 @@
         # 3. Rust Overlay (for latest Rust compiler)
         rust-overlay.url = "github:oxalica/rust-overlay";
         rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
+
+        # 4. Walker App Launcher
+        elephant.url = "github:abenz1267/elephant";
+        walker = { 
+          url = "github:abenz1267/walker";
+          inputs.elephant.follows = "elephant";
+          inputs.nixpkgs.follows = "nixpkgs";
+        };
     };
 
-    outputs = { self, nixpkgs, home-manager, rust-overlay, ... }@inputs: 
+    outputs = { self, nixpkgs, home-manager, rust-overlay, walker, ... }@inputs: 
         let
             system = "x86_64-linux";
         in {
@@ -33,6 +41,7 @@
                         {
                             home-manager.useGlobalPkgs = true;
                             home-manager.useUserPackages = true;
+                            home-manager.extraSpecialArgs = { inherit inputs; };
                             home-manager.users.nekoma = import ./home/default.nix;
                         }
                     ];
