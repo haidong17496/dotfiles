@@ -2,6 +2,9 @@
 
 {
     imports = [
+        ./hyprpaper.nix
+        ./hyprlock.nix
+        ./hypridle.nix
         ./hyprsunset.nix
     ];
 
@@ -20,10 +23,4 @@
         '';
     };
 
-    home.packages = with pkgs; [
-        hyprpaper
-        hyprlock
-        hypridle
-        hyprsunset
-    ];
 }

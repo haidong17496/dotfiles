@@ -8,6 +8,13 @@
         ./programs/default.nix
     ];
 
+    home.pointerCursor = {
+        gtk.enable = true;
+        package = pkgs.bibata-cursors;
+        name = "Bibata-Modern-Classic";
+        size = 24;
+    };
+
     home.username = "nekoma";
     home.homeDirectory = "/home/nekoma";
     

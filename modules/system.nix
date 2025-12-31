@@ -1,12 +1,12 @@
 { config, pkgs, ... }:
 
 {
+    # Systemd
+    systemd.services.display-manager.environment.XDG_CURRENT_DESKTOP = "X-NIXOS-SYSTEMD-AWARE";
+
     # Bootloader
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
-
-    # Display manager
-    systemd.services.display-manager.environment.XDG_CURRENT_DESKTOP = "X-NIXOS-SYSTEMD-AWARE";
 
     # Locale & Time
     time.timeZone = "Asia/Ho_Chi_Minh";
