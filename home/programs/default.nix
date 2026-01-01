@@ -7,6 +7,7 @@
         ./git.nix
         ./yazi.nix
         ./bluetooth.nix
+        ./direnv.nix
     ];
 
     home.packages = with pkgs; [

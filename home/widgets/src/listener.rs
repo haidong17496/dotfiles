@@ -2,12 +2,14 @@ use hyprland::event_listener::AsyncEventListener;
 use hyprland::shared::WorkspaceType;
 use hyprland::data::{Workspaces, Monitors};
 use hyprland::prelude::*;
-use iced::futures::SinkExt;
+use iced::futures::SinkExt; // Removed StreamExt (unused)
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
 use tokio::fs; 
 use regex::Regex;
 use std::time::Duration;
+use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher}; 
+// Removed std::path::Path import (we use std::path::Path fully qualified or inferred)
 
 use crate::island::Message;
 use crate::media::{self, MediaInfo}; 
@@ -168,9 +170,10 @@ pub fn listen_to_volume() -> impl iced::futures::Stream<Item = Message> {
     })
 }
 
-// --- BRIGHTNESS LISTENER (Optimized File IO) ---
+// --- BRIGHTNESS LISTENER (Optimized with Notify & Local Fn) ---
 pub fn listen_to_brightness() -> impl iced::futures::Stream<Item = Message> {
     iced::stream::channel(10, |mut output| async move {
+        // 1. Find the backlight path
         let mut backlight_path = None;
         if let Ok(mut entries) = fs::read_dir("/sys/class/backlight").await {
             while let Ok(Some(entry)) = entries.next_entry().await {
@@ -184,19 +187,51 @@ pub fn listen_to_brightness() -> impl iced::futures::Stream<Item = Message> {
             None => return, // No backlight found
         };
 
-        let current_path = path.join("brightness");
-        let max_path = path.join("max_brightness");
+        let brightness_file = path.join("brightness");
+        let max_file = path.join("max_brightness");
+
+        // FIXED: Use a local async function instead of a closure.
+        // This solves the "lifetime may not live long enough" errors.
+        async fn get_brightness(b_path: &std::path::Path, m_path: &std::path::Path) -> Option<f32> {
+            let current_res = fs::read_to_string(b_path).await;
+            let max_res = fs::read_to_string(m_path).await;
+            
+            if let (Ok(c_str), Ok(m_str)) = (current_res, max_res) {
+                if let (Ok(curr), Ok(max)) = (c_str.trim().parse::<f32>(), m_str.trim().parse::<f32>()) {
+                    return Some((curr / max).max(0.0).min(1.0));
+                }
+            }
+            None
+        }
 
         let mut last_brightness = -1.0;
 
+        // 2. Initial Read
+        if let Some(level) = get_brightness(&brightness_file, &max_file).await {
+            last_brightness = level;
+        }
+
+        // 3. Set up Watcher
+        let (tx, mut rx) = tokio::sync::mpsc::channel(10);
+        
+        let mut watcher = RecommendedWatcher::new(move |res| {
+            if let Ok(_) = res {
+                let _ = tx.blocking_send(());
+            }
+        }, Config::default()).ok();
+
+        if let Some(w) = &mut watcher {
+            let _ = w.watch(&brightness_file, RecursiveMode::NonRecursive);
+        }
+
+        // 4. Listen for events
         loop {
-            let current_res = fs::read_to_string(&current_path).await;
-            let max_res = fs::read_to_string(&max_path).await;
+            if rx.recv().await.is_some() {
+                // Debounce
+                tokio::time::sleep(Duration::from_millis(50)).await;
+                while let Ok(_) = rx.try_recv() {} 
 
-            if let (Ok(c_str), Ok(m_str)) = (current_res, max_res) {
-                if let (Ok(curr), Ok(max)) = (c_str.trim().parse::<f32>(), m_str.trim().parse::<f32>()) {
-                    let level = (curr / max).max(0.0).min(1.0);
-
+                if let Some(level) = get_brightness(&brightness_file, &max_file).await {
                     if (level - last_brightness).abs() > 0.01 {
                         if last_brightness != -1.0 {
                             let _ = output.send(Message::OsdUpdate { 
@@ -207,13 +242,14 @@ pub fn listen_to_brightness() -> impl iced::futures::Stream<Item = Message> {
                         last_brightness = level;
                     }
                 }
+            } else {
+                break; 
             }
-            tokio::time::sleep(Duration::from_millis(300)).await;
         }
     })
 }
 
-// --- BATTERY LISTENER (Optimized File IO) ---
+// --- BATTERY LISTENER (Optimized Polling) ---
 pub fn listen_to_battery() -> impl iced::futures::Stream<Item = Message> {
     iced::stream::channel(10, |mut output| async move {
         let mut bat_path = None;
@@ -253,7 +289,7 @@ pub fn listen_to_battery() -> impl iced::futures::Stream<Item = Message> {
                 is_charging 
             }).await;
 
-            tokio::time::sleep(Duration::from_secs(3)).await;
+            tokio::time::sleep(Duration::from_secs(10)).await;
         }
     })
 }
@@ -265,23 +301,17 @@ pub fn listen_to_media() -> impl iced::futures::Stream<Item = Message> {
         let mut last_playing = false;
 
         loop {
-            // Get current media status
             let info = tokio::task::spawn_blocking(|| media::get_active_media())
                 .await
                 .unwrap_or(None)
                 .unwrap_or(MediaInfo::default());
 
-            // Check if significant state changed
             let title_changed = info.title != last_title;
             let playing_changed = info.is_playing != last_playing;
             
-            // Logic:
-            // 1. If Playing: Always update (need to update progress bar timestamp, etc)
-            // 2. If Paused/Stopped: Only update if state actually changed (prevents flicker)
             if info.is_playing || title_changed || playing_changed {
                 last_title = info.title.clone();
                 last_playing = info.is_playing;
-                
                 let _ = output.send(Message::MediaUpdate(Some(info))).await;
             }
 
