@@ -20,9 +20,15 @@
           inputs.elephant.follows = "elephant";
           inputs.nixpkgs.follows = "nixpkgs";
         };
+
+        # 5. Nixvim
+        nixvim = {
+            url = "github:nix-community/nixvim/nixos-25.11";
+            inputs.nixpkgs.follows = "nixpkgs";
+        };
     };
 
-    outputs = { self, nixpkgs, home-manager, rust-overlay, walker, ... }@inputs: 
+    outputs = { self, nixpkgs, home-manager, rust-overlay, walker, nixvim, ... }@inputs: 
         let
             system = "x86_64-linux";
         in {

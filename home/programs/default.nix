@@ -2,8 +2,8 @@
 
 {
     imports = [
+        ./nvim
         ./browsers.nix
-        ./neovim.nix
         ./git.nix
         ./yazi.nix
         ./bluetooth.nix
