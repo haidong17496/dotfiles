@@ -4,6 +4,10 @@
     settings = {
       window = {
         opacity = 0.95;
+        padding = {
+          x = 8;
+          y = 8;
+        };
       };
       font = {
         normal.family = "JetBrainsMono Nerd Font";

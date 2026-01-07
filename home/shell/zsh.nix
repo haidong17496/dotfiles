@@ -5,11 +5,6 @@
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
 
-    prezto = {
-      enable = true;
-      caseSensitive = false;
-    };
-
     history = {
       size = 5000;
       saveNoDups = true;
@@ -27,6 +22,10 @@
 
     initContent = ''
       bindkey '^e' autosuggest-accept
+    '';
+
+    completionInit = ''
+      zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
     '';
 
     shellAliases = {
