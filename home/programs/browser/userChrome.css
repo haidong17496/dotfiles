@@ -188,14 +188,6 @@ html.theme-dark body div#root div#app header#toolbar.user-agent{background: -moz
 html.theme-dark body div#root div#app header#toolbar.user-agent *{border-radius: 7px !important;}
 html.theme-dark body div#root div#app header#toolbar.user-agent .devtools-separator{opacity:0 !important}
 
-/*  Changes for macos compatibility  */
-.titlebar-button { display: flex !important; }
-.titlebar-buttonbox-container{ order: 1000 !important; }
-.titlebar-buttonbox{ height: 100% !important; }
-:root:not([sizemode="maximized"], [sizemode="fullscreen"]) .titlebar-restore, :root:is([sizemode="maximized"], [sizemode="fullscreen"]) .titlebar-max{display: none !important;}
-.titlebar-buttonbox { margin-inline: 0 !important; }
-.titlebar-buttonbox-container{margin-bottom: 0px;}
-
 /*  Menubar  */
 /*  #toolbar-menubar[inactive]  */
 #main-window:has(#toolbar-menubar:not([inactive])) #toolbar-menubar{margin-bottom: -20px !important}
@@ -234,3 +226,13 @@ tab-group:not([collapsed]) .tabbrowser-tab:last-of-type{border-top-right-radius:
 tab-group .tabbrowser-tab{background-color: color-mix(in oklab, var(--tab-group-color) 30%, #0000)!important;}
 .tab-group-line{display: none !important}
 .tab-group-label{background: none !important; height: 100%; align-content: center;}
+
+/* Hides the container holding the buttons */
+.titlebar-buttonbox-container {
+    display: none !important;
+}
+
+/* Hides the specific close button just in case */
+.titlebar-close {
+    display: none !important;
+}

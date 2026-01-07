@@ -1,23 +1,21 @@
-{ pkgs, ... }:
+{pkgs, ...}: {
+  imports = [
+    ./nvim
+    ./browser
+    ./git.nix
+    ./yazi.nix
+    ./bluetooth.nix
+    ./direnv.nix
+  ];
 
-{
-    imports = [
-        ./nvim
-        ./browsers.nix
-        ./git.nix
-        ./yazi.nix
-        ./bluetooth.nix
-        ./direnv.nix
-    ];
-
-    home.packages = with pkgs; [
-        ripgrep
-        fd
-        jq
-        p7zip
-        bluetuith
-        pulsemixer
-        brightnessctl
-        bottom
-    ];
+  home.packages = with pkgs; [
+    ripgrep
+    fd
+    jq
+    p7zip
+    bluetuith
+    pulsemixer
+    brightnessctl
+    bottom
+  ];
 }

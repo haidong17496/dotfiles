@@ -21,7 +21,7 @@
     keymaps = [
       {
         mode = "n";
-        key = "<leader>e";
+        key = "\\";
         action = "<cmd>Neotree toggle<CR>";
         options.desc = "Toggle Explorer";
       }

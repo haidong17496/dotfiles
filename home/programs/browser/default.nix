@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  inputs,
+  ...
+}: {
   programs.firefox = {
     enable = true;
     profiles.default = {
@@ -15,8 +19,9 @@
         "datareporting.usage.uploadEnabled" = false;
       };
 
-      extensions.packages = with inputs.firefox-addons.packages.${pkgs.system}; [
+      extensions.packages = with inputs.firefox-addons.packages.${pkgs.stdenv.hostPlatform.system}; [
         translate-web-pages
+        ublock-origin
         vimium
       ];
 
