@@ -15,6 +15,7 @@
     ./plugins/neo-tree.nix
     ./plugins/telescope.nix
     ./plugins/treesitter.nix
+    ./plugins/flash.nix
     ./plugins/which-key.nix
   ];
 
