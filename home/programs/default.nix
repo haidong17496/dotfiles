@@ -6,6 +6,7 @@
     ./yazi.nix
     ./bluetooth.nix
     ./direnv.nix
+    ./island.nix
   ];
 
   home.packages = with pkgs; [

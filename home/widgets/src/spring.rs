@@ -2,7 +2,7 @@
 pub struct Spring {
     pub current: f32,
     pub target: f32,
-    speed: f32, 
+    speed: f32,
 }
 
 impl Default for Spring {
@@ -10,7 +10,7 @@ impl Default for Spring {
         Self {
             current: 0.0,
             target: 0.0,
-            speed: 0.15, 
+            speed: 0.15,
         }
     }
 }
@@ -31,9 +31,12 @@ impl Spring {
     pub fn update(&mut self, _dt: f32) -> bool {
         let diff = self.target - self.current;
 
-        // PERF FIX: Snap to target when close to stop the animation loop
+        // OPTIMIZATION: Snap to target if close enough.
+        // This prevents the "Zeno's Paradox" where it moves 0.00001 pixels forever.
         if diff.abs() < 0.5 {
-            self.current = self.target;
+            if self.current != self.target {
+                self.current = self.target;
+            }
             return false; // Animation stopped
         }
 
