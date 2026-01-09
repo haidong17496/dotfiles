@@ -2,11 +2,11 @@
   imports = [
     ./nvim
     ./browser
+    ./waybar
     ./git.nix
     ./yazi.nix
     ./bluetooth.nix
     ./direnv.nix
-    ./island.nix
   ];
 
   home.packages = with pkgs; [
@@ -18,5 +18,7 @@
     pulsemixer
     brightnessctl
     bottom
+    grim
+    slurp
   ];
 }

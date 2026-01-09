@@ -1,0 +1,55 @@
+* {
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 13px;
+  font-weight: bold;
+  min-height: 0;
+}
+
+/* The Bar Itself */
+window#waybar {
+  background-color: #1e1e2e; /* Solid Background */
+  color: #cdd6f4;
+  border-bottom: 1px solid #313244;
+  padding: 0; /* Remove padding so modules touch the edges */
+}
+
+/* --- WORKSPACES --- */
+#workspaces {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+
+#workspaces button {
+  padding: 0 15px; /* Width of the button */
+  color: #a6adc8;
+  border-radius: 0; /* Square corners to fill the bar */
+  margin: 0; /* No gaps between buttons */
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+/* The "Active" state now fills the full height */
+#workspaces button.active {
+  color: #89b4fa;
+  background-color: #313244; /* Darker background for active */
+  border-bottom: 2px solid #89b4fa; /* Blue underline */
+}
+
+#workspaces button:hover {
+  background-color: #313244;
+}
+
+/* --- CLOCK --- */
+#clock {
+  padding: 0 15px;
+  background-color: #313244; /* Distinct background */
+  color: #fab387;
+  margin: 0;
+}
+
+/* --- TRAY --- */
+#tray {
+  padding: 0 15px;
+  margin: 0;
+}
