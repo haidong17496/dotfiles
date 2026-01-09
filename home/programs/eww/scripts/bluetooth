@@ -1,0 +1,6 @@
+#!/bin/sh
+if [ "$1" = "icon" ]; then
+  bluetoothctl show | grep "Powered: yes" >/dev/null && echo "" || echo "󰂲"
+elif [ "$1" = "status" ]; then
+  bluetoothctl show | grep "Powered: yes" >/dev/null && echo "On" || echo "Off"
+fi

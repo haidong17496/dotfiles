@@ -1,0 +1,169 @@
+// VARIABLES (SCSS Syntax)
+$bg: #1e1e2e;
+$mantle: #181825;
+$surface: #313244;
+$blue: #89b4fa;
+$text: #cdd6f4;
+$subtext: #a6adc8;
+$red: #f38ba8;
+
+* {
+  all: unset;
+  font-family: "JetBrainsMono Nerd Font";
+  font-weight: bold;
+}
+
+// Transparent window background
+window {
+  background-color: transparent;
+}
+
+// MAIN CONTAINER
+.main-container {
+  background-color: $bg;
+  border-radius: 24px;
+  border: 2px solid $blue;
+  // Box shadow doesn't work well in GTK CSS sometimes, relies on compositor
+}
+
+// SEPARATOR
+.separator {
+  background-color: $surface;
+  min-width: 2px;
+  margin: 30px 0;
+}
+
+// LEFT PANE
+.left-pane {
+  padding: 30px;
+  min-width: 360px;
+}
+
+.time {
+  font-size: 48px;
+  color: $blue;
+}
+
+.date {
+  font-size: 16px;
+  color: $subtext;
+  margin-bottom: 20px;
+}
+
+.toggles-box {
+  margin-bottom: 20px;
+}
+
+.btn {
+  background-color: $surface;
+  color: $text;
+  padding: 15px;
+  border-radius: 14px;
+  font-size: 14px;
+  min-width: 140px;
+}
+
+.btn:hover {
+  background-color: $blue;
+  color: $bg;
+}
+
+.slider-box {
+  background-color: $mantle;
+  padding: 20px;
+  border-radius: 16px;
+}
+
+.icon {
+  font-size: 20px;
+  color: $blue;
+  margin-right: 10px;
+}
+
+scale trough {
+  all: unset;
+  background-color: $surface;
+  border-radius: 10px;
+  min-height: 8px;
+  min-width: 180px;
+}
+
+scale highlight {
+  all: unset;
+  background-color: $blue;
+  border-radius: 10px;
+}
+
+.media-box {
+  background-color: $mantle;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid $surface;
+}
+
+.media-title {
+  font-size: 14px;
+  margin-bottom: 15px;
+  color: $text;
+}
+
+.media-btn {
+  font-size: 24px;
+  color: $blue;
+  border-radius: 50%;
+  padding: 5px;
+  margin: 0 10px;
+}
+
+.media-btn:hover {
+  background-color: $surface;
+}
+
+// RIGHT PANE
+.right-pane {
+  padding: 30px;
+  min-width: 360px;
+  background-color: $mantle;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.panel-header {
+  font-size: 22px;
+  color: $text;
+  border-bottom: 2px solid $surface;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.calendar {
+  color: $text;
+  background-color: $bg;
+  border-radius: 16px;
+  padding: 10px;
+}
+
+.calendar:selected {
+  color: $blue;
+  font-weight: 800;
+}
+
+.calendar:header {
+  color: $blue;
+}
+
+.calendar button {
+  padding: 5px;
+  color: $subtext;
+}
+
+.calendar button:hover {
+  color: $blue;
+}
+
+.quote {
+  font-size: 14px;
+  color: $subtext;
+  font-style: italic;
+  margin-top: 20px;
+}

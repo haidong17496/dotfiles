@@ -1,0 +1,6 @@
+#!/bin/sh
+if [ "$1" = "icon" ]; then
+  nmcli -t -f active,ssid dev wifi | grep '^yes' >/dev/null && echo " " || echo "󰤭 "
+elif [ "$1" = "name" ]; then
+  nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d: -f2 || echo "Disconnected"
+fi
