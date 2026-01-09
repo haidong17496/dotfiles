@@ -143,7 +143,13 @@ impl DynamicIsland {
             Message::Tick(_) => self.handle_tick(),
             Message::CycleMode => self.handle_cycle_mode(),
             Message::MediaTick(_) => Task::perform(async {
-                tokio::task::spawn_blocking(|| media::get_active_media()).await.unwrap_or(None)
+                tokio::task::spawn_blocking(|| {
+                    if let Ok(finder) = mpris::PlayerFinder::new() {
+                        media::get_active_media(&finder)
+                    } else {
+                        None
+                    }
+                }).await.unwrap_or(None)
             }, Message::MediaUpdate),
             Message::MediaUpdate(info) => {
                 let new_info = info.clone().unwrap_or(MediaInfo::default());
@@ -210,7 +216,7 @@ impl DynamicIsland {
 
         // Only tick if animations are running OR auto-close timer is active OR media is playing
         if self.is_animating || self.auto_close_timer.is_some() || should_tick_for_media {
-            subs.push(time::every(Duration::from_millis(16)).map(|_| Message::Tick(())));
+            subs.push(time::every(Duration::from_millis(33)).map(|_| Message::Tick(())));
         }
 
         subs.push(time::every(Duration::from_secs(1)).map(|_| Message::ClockTick(())));

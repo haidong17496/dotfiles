@@ -2,17 +2,16 @@ use hyprland::event_listener::AsyncEventListener;
 use hyprland::shared::WorkspaceType;
 use hyprland::data::{Workspaces, Monitors};
 use hyprland::prelude::*;
-use iced::futures::SinkExt; // Removed StreamExt (unused)
+use iced::futures::SinkExt;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command;
-use tokio::fs; 
+use tokio::fs;
 use regex::Regex;
 use std::time::Duration;
-use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher}; 
-// Removed std::path::Path import (we use std::path::Path fully qualified or inferred)
+use notify::{Config, RecommendedWatcher, RecursiveMode, Watcher};
 
 use crate::island::Message;
-use crate::media::{self, MediaInfo}; 
+use crate::media::{self, MediaInfo};
 
 // --- HYPRLAND WORKSPACE HELPER ---
 async fn fetch_and_sort() -> Option<(Vec<i32>, Vec<i32>)> {
@@ -29,9 +28,9 @@ async fn fetch_and_sort() -> Option<(Vec<i32>, Vec<i32>)> {
     for ws in workspaces {
         if Some(&ws.monitor) == left_name.as_ref() { left.push(ws.id); }
         else if Some(&ws.monitor) == right_name.as_ref() { right.push(ws.id); }
-        else if right_name.is_none() { left.push(ws.id); } 
+        else if right_name.is_none() { left.push(ws.id); }
     }
-    left.sort(); 
+    left.sort();
     right.sort();
     Some((left, right))
 }
@@ -39,18 +38,17 @@ async fn fetch_and_sort() -> Option<(Vec<i32>, Vec<i32>)> {
 // --- HYPRLAND LISTENER ---
 pub fn listen_to_hyprland() -> impl iced::futures::Stream<Item = Message> {
     iced::stream::channel(100, |mut output| async move {
-        // Initial Fetch
-        if let Some((l, r)) = fetch_and_sort().await { 
-            let _ = output.send(Message::WorkspaceDataUpdated { left: l, right: r }).await; 
+        if let Some((l, r)) = fetch_and_sort().await {
+            let _ = output.send(Message::WorkspaceDataUpdated { left: l, right: r }).await;
         }
-        if let Ok(active) = hyprland::data::Workspace::get_active_async().await { 
-            let _ = output.send(Message::ActiveWorkspaceChanged(active.id)).await; 
+        if let Ok(active) = hyprland::data::Workspace::get_active_async().await {
+            let _ = output.send(Message::ActiveWorkspaceChanged(active.id)).await;
         }
 
         let mut listener = AsyncEventListener::new();
-        let s1 = output.clone(); 
-        let s2 = output.clone(); 
-        let s3 = output.clone(); 
+        let s1 = output.clone();
+        let s2 = output.clone();
+        let s3 = output.clone();
 
         listener.add_workspace_changed_handler(move |event| {
             let mut sender = s1.clone();
@@ -83,19 +81,19 @@ pub fn listen_to_hyprland() -> impl iced::futures::Stream<Item = Message> {
                 }
             })
         };
-        
+
         let r1 = s3.clone(); listener.add_window_opened_handler(move |_| refresh(r1.clone()));
         let r2 = s3.clone(); listener.add_window_closed_handler(move |_| refresh(r2.clone()));
         let r3 = s3.clone(); listener.add_workspace_added_handler(move |_| refresh(r3.clone()));
         let r4 = s3.clone(); listener.add_workspace_deleted_handler(move |_| refresh(r4.clone()));
         let r5 = s3.clone(); listener.add_monitor_added_handler(move |_| refresh(r5.clone()));
         let r6 = s3.clone(); listener.add_monitor_removed_handler(move |_| refresh(r6.clone()));
-        
+
         listener.start_listener_async().await.ok();
     })
 }
 
-// --- VOLUME LISTENER (Debounced) ---
+// --- VOLUME LISTENER ---
 pub fn listen_to_volume() -> impl iced::futures::Stream<Item = Message> {
     iced::stream::channel(10, |mut output| async move {
         let mut last_known_level = -1.0;
@@ -109,9 +107,9 @@ pub fn listen_to_volume() -> impl iced::futures::Stream<Item = Message> {
                 .output()
                 .await
                 .ok()?;
-            
+
             let out_str = String::from_utf8_lossy(&wp_output.stdout);
-            
+
             if let Some(caps) = re.captures(&out_str) {
                 if let Some(m) = caps.get(1) {
                     if let Ok(vol_float) = m.as_str().parse::<f32>() {
@@ -124,7 +122,6 @@ pub fn listen_to_volume() -> impl iced::futures::Stream<Item = Message> {
             None
         }
 
-        // Initial fetch
         if let Some((lvl, muted)) = get_wpctl_status(&re_vol).await {
             last_known_level = lvl;
             last_known_muted = muted;
@@ -133,7 +130,7 @@ pub fn listen_to_volume() -> impl iced::futures::Stream<Item = Message> {
         let mut child = match Command::new("pactl")
             .arg("subscribe")
             .stdout(std::process::Stdio::piped())
-            .spawn() 
+            .spawn()
         {
             Ok(c) => c,
             Err(e) => {
@@ -155,13 +152,13 @@ pub fn listen_to_volume() -> impl iced::futures::Stream<Item = Message> {
                         last_known_level = level;
                         last_known_muted = is_muted;
 
-                        let icon = if is_muted || level <= 0.0 { "\u{f026}" } 
-                                   else if level < 0.5 { "\u{f027}" } 
-                                   else { "\u{f028}" }; 
-                        
-                        let _ = output.send(Message::OsdUpdate { 
-                            icon: icon.to_string(), 
-                            level 
+                        let icon = if is_muted || level <= 0.0 { "\u{f026}" }
+                                   else if level < 0.5 { "\u{f027}" }
+                                   else { "\u{f028}" };
+
+                        let _ = output.send(Message::OsdUpdate {
+                            icon: icon.to_string(),
+                            level
                         }).await;
                     }
                 }
@@ -170,10 +167,9 @@ pub fn listen_to_volume() -> impl iced::futures::Stream<Item = Message> {
     })
 }
 
-// --- BRIGHTNESS LISTENER (Optimized with Notify & Local Fn) ---
+// --- BRIGHTNESS LISTENER ---
 pub fn listen_to_brightness() -> impl iced::futures::Stream<Item = Message> {
     iced::stream::channel(10, |mut output| async move {
-        // 1. Find the backlight path
         let mut backlight_path = None;
         if let Ok(mut entries) = fs::read_dir("/sys/class/backlight").await {
             while let Ok(Some(entry)) = entries.next_entry().await {
@@ -184,18 +180,16 @@ pub fn listen_to_brightness() -> impl iced::futures::Stream<Item = Message> {
 
         let path = match backlight_path {
             Some(p) => p,
-            None => return, // No backlight found
+            None => return,
         };
 
         let brightness_file = path.join("brightness");
         let max_file = path.join("max_brightness");
 
-        // FIXED: Use a local async function instead of a closure.
-        // This solves the "lifetime may not live long enough" errors.
         async fn get_brightness(b_path: &std::path::Path, m_path: &std::path::Path) -> Option<f32> {
             let current_res = fs::read_to_string(b_path).await;
             let max_res = fs::read_to_string(m_path).await;
-            
+
             if let (Ok(c_str), Ok(m_str)) = (current_res, max_res) {
                 if let (Ok(curr), Ok(max)) = (c_str.trim().parse::<f32>(), m_str.trim().parse::<f32>()) {
                     return Some((curr / max).max(0.0).min(1.0));
@@ -206,14 +200,12 @@ pub fn listen_to_brightness() -> impl iced::futures::Stream<Item = Message> {
 
         let mut last_brightness = -1.0;
 
-        // 2. Initial Read
         if let Some(level) = get_brightness(&brightness_file, &max_file).await {
             last_brightness = level;
         }
 
-        // 3. Set up Watcher
         let (tx, mut rx) = tokio::sync::mpsc::channel(10);
-        
+
         let mut watcher = RecommendedWatcher::new(move |res| {
             if let Ok(_) = res {
                 let _ = tx.blocking_send(());
@@ -224,32 +216,30 @@ pub fn listen_to_brightness() -> impl iced::futures::Stream<Item = Message> {
             let _ = w.watch(&brightness_file, RecursiveMode::NonRecursive);
         }
 
-        // 4. Listen for events
         loop {
             if rx.recv().await.is_some() {
-                // Debounce
                 tokio::time::sleep(Duration::from_millis(50)).await;
-                while let Ok(_) = rx.try_recv() {} 
+                while let Ok(_) = rx.try_recv() {}
 
                 if let Some(level) = get_brightness(&brightness_file, &max_file).await {
                     if (level - last_brightness).abs() > 0.01 {
                         if last_brightness != -1.0 {
-                            let _ = output.send(Message::OsdUpdate { 
-                                icon: "\u{f185}".to_string(), 
-                                level 
+                            let _ = output.send(Message::OsdUpdate {
+                                icon: "\u{f185}".to_string(),
+                                level
                             }).await;
                         }
                         last_brightness = level;
                     }
                 }
             } else {
-                break; 
+                break;
             }
         }
     })
 }
 
-// --- BATTERY LISTENER (Optimized Polling) ---
+// --- BATTERY LISTENER ---
 pub fn listen_to_battery() -> impl iced::futures::Stream<Item = Message> {
     iced::stream::channel(10, |mut output| async move {
         let mut bat_path = None;
@@ -262,7 +252,7 @@ pub fn listen_to_battery() -> impl iced::futures::Stream<Item = Message> {
                 }
             }
         }
-        
+
         let path = bat_path.unwrap_or_else(|| "/sys/class/power_supply/BAT0".to_string());
 
         loop {
@@ -284,9 +274,9 @@ pub fn listen_to_battery() -> impl iced::futures::Stream<Item = Message> {
 
             let is_charging = status == "Charging" || status == "Full" || status == "Not charging";
 
-            let _ = output.send(Message::BatteryUpdate { 
-                level: capacity, 
-                is_charging 
+            let _ = output.send(Message::BatteryUpdate {
+                level: capacity,
+                is_charging
             }).await;
 
             tokio::time::sleep(Duration::from_secs(10)).await;
@@ -294,21 +284,30 @@ pub fn listen_to_battery() -> impl iced::futures::Stream<Item = Message> {
     })
 }
 
-// --- MEDIA LISTENER (Robust & Debounced) ---
+// --- MEDIA LISTENER (FIXED THREAD SAFETY) ---
 pub fn listen_to_media() -> impl iced::futures::Stream<Item = Message> {
     iced::stream::channel(10, |mut output| async move {
         let mut last_title = String::new();
         let mut last_playing = false;
 
         loop {
-            let info = tokio::task::spawn_blocking(|| media::get_active_media())
-                .await
-                .unwrap_or(None)
-                .unwrap_or(MediaInfo::default());
+            // FIXED: We create the finder INSIDE the spawn_blocking closure.
+            // This prevents passing the !Send 'Rc' pointer across threads.
+            let info = tokio::task::spawn_blocking(|| {
+                if let Ok(finder) = mpris::PlayerFinder::new() {
+                    // This function takes &finder, which is fine since it stays inside this thread
+                    media::get_active_media(&finder)
+                } else {
+                    None
+                }
+            })
+            .await
+            .unwrap_or(None)
+            .unwrap_or(MediaInfo::default());
 
             let title_changed = info.title != last_title;
             let playing_changed = info.is_playing != last_playing;
-            
+
             if info.is_playing || title_changed || playing_changed {
                 last_title = info.title.clone();
                 last_playing = info.is_playing;

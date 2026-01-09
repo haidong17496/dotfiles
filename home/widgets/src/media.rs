@@ -8,8 +8,7 @@ pub struct MediaInfo {
     pub is_playing: bool,
     pub length: Option<Duration>,
     pub position: Option<Duration>,
-
-    #[allow(dead_code)] // Suppress warning: we store it but re-fetch it dynamically on seek
+    #[allow(dead_code)]
     pub track_id: Option<TrackID>,
 }
 
@@ -40,32 +39,28 @@ fn player_to_media_info(player: &mpris::Player) -> Option<MediaInfo> {
     })
 }
 
-pub fn get_active_media() -> Option<MediaInfo> {
-    let finder = match PlayerFinder::new() {
-        Ok(f) => f,
-        Err(_) => return None,
-    };
-
-    // Safety check: find_all can fail
+// Accepts &PlayerFinder to reuse the connection
+pub fn get_active_media(finder: &PlayerFinder) -> Option<MediaInfo> {
     let players = finder.find_all().ok()?;
 
-    // 1. Priority: Is Playing AND has a valid Title
+    // 1. Priority: Playing + Valid Title + NOT "Firefox"
     if let Some(player) = players.iter().find(|p| {
         let is_playing = matches!(p.get_playback_status(), Ok(PlaybackStatus::Playing));
-        let has_title = p.get_metadata().ok()
-            .and_then(|m| m.title().map(|t| !t.is_empty() && t != "Unknown"))
-            .unwrap_or(false);
-        is_playing && has_title
+        let title = p.get_metadata().ok().and_then(|m| m.title().map(|t| t.to_string())).unwrap_or_default();
+
+        let valid_title = !title.is_empty() && title != "Unknown" && title != "Firefox" && title != "Mozilla Firefox";
+
+        is_playing && valid_title
     }) {
         return player_to_media_info(player);
     }
 
-    // 2. Fallback: Just Playing (even if title is missing)
+    // 2. Fallback: Just Playing
     if let Some(player) = players.iter().find(|p| matches!(p.get_playback_status(), Ok(PlaybackStatus::Playing))) {
         return player_to_media_info(player);
     }
 
-    // 3. Fallback: Paused (if nothing is playing)
+    // 3. Fallback: Paused
     if let Some(player) = players.iter().find(|p| matches!(p.get_playback_status(), Ok(PlaybackStatus::Paused))) {
         return player_to_media_info(player);
     }
@@ -73,13 +68,7 @@ pub fn get_active_media() -> Option<MediaInfo> {
     None
 }
 
-#[derive(Debug, Clone, Copy)]
-pub enum MediaControl {
-    PlayPause,
-    Next,
-    Previous,
-}
-
+// --- COMMANDS ---
 pub fn send_command(control: MediaControl) {
     let finder = match PlayerFinder::new() { Ok(f) => f, Err(_) => return, };
     if let Some(player) = get_best_player_for_command(&finder) {
@@ -102,21 +91,23 @@ pub fn seek(position: Duration) {
     }
 }
 
+// FIXED: Returns owned Player by removing it from the Vec
 fn get_best_player_for_command(finder: &PlayerFinder) -> Option<mpris::Player> {
-    let players = finder.find_all().ok()?;
-    let find_by_identity = |identity: &str| -> Result<mpris::Player, FindingError> {
-        finder.find_by_name(identity)
-    };
+    let mut players = finder.find_all().ok()?;
 
-    // Prefer playing player
-    if let Some(p) = players.iter().find(|p| matches!(p.get_playback_status(), Ok(PlaybackStatus::Playing))) {
-        if let Ok(player) = find_by_identity(p.identity()) { return Some(player); }
+    // 1. Find index of playing player
+    if let Some(index) = players.iter().position(|p| matches!(p.get_playback_status(), Ok(PlaybackStatus::Playing))) {
+        return Some(players.remove(index));
     }
-    // Fallback to active
-    if let Ok(p) = finder.find_active() { return Some(p); }
-    // Fallback to any
-    if let Some(p) = players.iter().next() {
-        if let Ok(player) = find_by_identity(p.identity()) { return Some(player); }
+
+    // 2. Find index of paused player
+    if let Some(index) = players.iter().position(|p| matches!(p.get_playback_status(), Ok(PlaybackStatus::Paused))) {
+        return Some(players.remove(index));
     }
-    None
+
+    // 3. Fallback: Take the first one if any exist
+    players.into_iter().next()
 }
+
+#[derive(Debug, Clone, Copy)]
+pub enum MediaControl { PlayPause, Next, Previous }
