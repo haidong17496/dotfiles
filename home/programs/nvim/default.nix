@@ -39,13 +39,16 @@
       };
     };
 
-    plugins.web-devicons.enable = true;
+    plugins = {
+      web-devicons.enable = true;
+      tmux-navigator.enable = true;
 
-    # Status Line (Essential for UX)
-    plugins.lualine = {
-      enable = true;
-      settings.options = {
-        theme = "dracula";
+      # Status Line (Essential for UX)
+      lualine = {
+        enable = true;
+        settings.options = {
+          theme = "dracula";
+        };
       };
     };
   };

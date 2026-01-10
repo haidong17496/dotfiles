@@ -7,6 +7,8 @@
     ./yazi.nix
     ./bluetooth.nix
     ./direnv.nix
+    ./media.nix
+    ./tmux.nix
   ];
 
   home.packages = with pkgs; [
