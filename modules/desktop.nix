@@ -14,18 +14,7 @@
   xdg.portal = {
     enable = true;
     extraPortals = [
-      pkgs.xdg-desktop-portal-hyprland
       pkgs.xdg-desktop-portal-gtk
     ];
   };
-
-  # 4. Critical Wayland Dependencies
-  environment.systemPackages = with pkgs; [
-    wayland
-    wayland-protocols
-    libxkbcommon
-    vulkan-loader
-    mesa
-    wl-clipboard
-  ];
 }
