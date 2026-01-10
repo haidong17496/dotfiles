@@ -2,6 +2,13 @@
   programs.zathura = {
     enable = true;
 
+    package = pkgs.zathura.override {
+      plugins = [
+        pkgs.zathuraPkgs.zathura_pdf_mupdf
+        pkgs.zathuraPkgs.zathura_djvu
+      ];
+    };
+
     options = {
       default-bg = "#1e1e2e";
       default-fg = "#cdd6f4";

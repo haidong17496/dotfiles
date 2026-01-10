@@ -1,7 +1,6 @@
 {pkgs, ...}: {
   programs.tmux = {
     enable = true;
-    shellIntegration.enable = true;
 
     # Change Prefix from Ctrl+b to Ctrl+a (Easier to hit)
     prefix = "C-a";
