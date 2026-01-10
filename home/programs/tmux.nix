@@ -32,6 +32,14 @@
       bind-key -T copy-mode-vi v send-keys -X begin-selection
       bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
       bind-key -T copy-mode-vi y send-keys -X copy-selection-and-cancel
+
+      bind -r j resize-pane -D 5
+      bind -r k resize-pane -U 5
+      bind -r l resize-pane -R 5
+      bind -r h resize-pane -L 5
+
+      # Maximizing pane (Zoom) - Standard is 'z', usually 'm' is used as an alias
+      bind -r m resize-pane -Z
     '';
 
     plugins = with pkgs.tmuxPlugins; [

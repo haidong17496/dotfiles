@@ -6,8 +6,15 @@
   # Systemd
   systemd.services.display-manager.environment.XDG_CURRENT_DESKTOP = "X-NIXOS-SYSTEMD-AWARE";
 
+  systemd.tmpfiles.rules = [
+    "d /mnt/backup 0755 nekoma users -"
+  ];
+
   # Bootloader
-  boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot = {
+    enable = true;
+    configurationLimit = 10;
+  };
   boot.loader.efi.canTouchEfiVariables = true;
 
   # Locale & Time
@@ -44,9 +51,11 @@
 
   programs.zsh.enable = true;
   services.udisks2.enable = true;
+
   environment.systemPackages = with pkgs; [
     wget
     curl
     pciutils
+    nh
   ];
 }

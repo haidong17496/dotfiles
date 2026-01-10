@@ -29,8 +29,10 @@
     '';
 
     shellAliases = {
-      nrs = "sudo nixos-rebuild switch --flake ~/dotfiles#astral";
-      ngc = "sudo nix-collect-garbage -d";
+      nrs = "nh os switch ~/dotfiles";
+      nrb = "nh os boot ~/dotfiles";
+      ngc = "sudo nh clean all --keep 3";
+      nlg = "nixos-rebuild list-generations";
     };
   };
 }
