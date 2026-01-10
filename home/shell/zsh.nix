@@ -30,8 +30,7 @@
 
     shellAliases = {
       nrs = "sudo nixos-rebuild switch --flake ~/dotfiles#astral";
-      ngc = "nix-collect-garbage -d";
-      nrb = "sudo nixos-rebuild boot --flake ~/dotfiles#astral";
+      ngc = "sudo nix-collect-garbage -d";
     };
   };
 }
