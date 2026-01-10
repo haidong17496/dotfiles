@@ -3,7 +3,6 @@
     enable = true;
     settings = {
       window = {
-        opacity = 0.95;
         padding = {
           x = 10;
           y = 8;
