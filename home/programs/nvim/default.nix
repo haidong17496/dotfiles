@@ -17,6 +17,7 @@
     ./plugins/treesitter.nix
     ./plugins/flash.nix
     ./plugins/which-key.nix
+    ./plugins/markview.nix
   ];
 
   programs.nixvim = {
