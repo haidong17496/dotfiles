@@ -24,5 +24,8 @@
     bottom
     grim
     slurp
+
+    # GUI
+    obsidian
   ];
 }
