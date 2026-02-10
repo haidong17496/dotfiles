@@ -4,7 +4,6 @@
     settings = {
       window = {
         padding = {
-          x = 10;
           y = 8;
         };
       };

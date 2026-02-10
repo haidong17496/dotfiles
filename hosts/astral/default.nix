@@ -1,23 +1,30 @@
-{ config, pkgs, ... }:
-
 {
-    imports = [
-        ./hardware-configuration.nix
-        ../../modules/system.nix
-        ../../modules/desktop.nix
-        ../../modules/nvidia.nix
-    ];
-    
-    networking.hostName = "astral";
-    networking.networkmanager.enable = true;
+  config,
+  pkgs,
+  ...
+}: {
+  imports = [
+    ./hardware-configuration.nix
+    ../../modules/system.nix
+    ../../modules/desktop.nix
+    ../../modules/nvidia.nix
+  ];
 
-    users.users.nekoma = {
-        isNormalUser = true;
-        extraGroups = [ "networkmanager" "wheel" "video" "input" ];
-        shell = pkgs.zsh;
-    };
+  networking.hostName = "astral";
+  networking.networkmanager.enable = true;
 
-    nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  users.users.nekoma = {
+    isNormalUser = true;
+    extraGroups = ["networkmanager" "wheel" "video" "input"];
+    shell = pkgs.zsh;
+  };
 
-    system.stateVersion = "25.11";
+  nix.settings.experimental-features = ["nix-command" "flakes"];
+
+  environment.systemPackages = with pkgs; [
+    realesrgan-ncnn-vulkan
+    vulkan-tools
+  ];
+
+  system.stateVersion = "25.11";
 }
