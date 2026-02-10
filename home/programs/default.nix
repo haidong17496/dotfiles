@@ -1,5 +1,6 @@
 {pkgs, ...}: {
   imports = [
+    ./swaync
     ./nvim
     ./browser
     ./waybar
@@ -25,7 +26,7 @@
     ripgrep
     fd
     jq
-    btop
+    bottom
 
     # Archives
     p7zip

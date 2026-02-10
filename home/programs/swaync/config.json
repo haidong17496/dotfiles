@@ -1,0 +1,43 @@
+{
+  "$schema": "https://raw.githubusercontent.com/ErikReider/SwayNotificationCenter/main/src/config.schema.json",
+  "positionX": "right",
+  "positionY": "top",
+  "control-center-width": 380,
+  "widgets": [
+    "title",
+    "label",
+    "buttons-grid",
+    "mpris",
+    "volume",
+    "backlight",
+    "notifications"
+  ],
+  "widget-config": {
+    "title": {
+      "text": "Control Center",
+      "clear-all-button": true,
+      "button-text": "󰎟"
+    },
+    "label": {
+      "max-lines": 10,
+      "text": "cmd: cal",
+      "clear-all-button": false
+    },
+    "buttons-grid": {
+      "actions": [
+        {
+          "label": "󰖩",
+          "command": "alacritty -e nmtui"
+        },
+        {
+          "label": "󰂯",
+          "command": "alacritty -e bluetuith"
+        },
+        {
+          "label": "󰄀",
+          "command": "toggle-hyprsunset"
+        }
+      ]
+    }
+  }
+}

@@ -9,117 +9,63 @@
 }
 
 window#waybar {
-    background: transparent;
+    background-color: rgba(30, 30, 46, 0.95);
     color: #cdd6f4;
+    border-bottom: 1px solid #313244;
+    margin: 0;
 }
 
-tooltip {
-    background: #1e1e2e;
-    border-radius: 10px;
-    border: 1px solid #313244;
-}
-
-tooltip label {
-    color: #cdd6f4;
-}
-
-/* --- MODULES (General) --- */
+/* --- MODULES (Gỡ bỏ hình viên thuốc) --- */
 #clock,
 #tray,
 #pulseaudio,
 #network,
-#battery {
-    background-color: #1e1e2e;
-    padding: 3px 12px;
-    margin: 2px 4px;
-    border-radius: 15px;
-    border: 1px solid #313244;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-}
-
-/* --- WORKSPACES (Improved Fit) --- */
-#workspaces {
-    background-color: #1e1e2e;
-    border-radius: 15px;
-    border: 1px solid #313244;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-}
-
-#workspaces button {
+#battery,
+#workspaces,
+#window {
     background-color: transparent;
-    color: #a6adc8;
-    border-radius: 10px;
-    transition: all 0.3s ease;
+    padding: 0 12px;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
 }
 
-#workspaces button:hover {
-    background-color: #313244;
+/* --- WORKSPACES (Thanh điều hướng) --- */
+#workspaces button {
+    padding: 0 8px;
+    color: #a6adc8;
+    background-color: transparent;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
 }
 
 #workspaces button.active {
-    background-color: #89b4fa; /* Solid Blue */
-    color: #1e1e2e;            /* Dark Text */
-    min-width: 20px;
-    /*padding: 3px 15px;*/
-}
-
-/* --- WINDOW TITLE (Fixed Ghost Container) --- */
-#window {
-    background-color: #181825;
-    padding: 3px 12px;
-    margin: 2px 4px;
-    border-radius: 15px;
-    border: 1px solid #313244;
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-}
-
-window#waybar.empty #window {
-    background-color: transparent;
-    border: none;
-    box-shadow: none;
-    padding: 0;
-    margin: 0;
-}
-
-/* --- SPECIFIC COLORS --- */
-
-#clock {
-    color: #cba6f7;
-    font-weight: 900;
-}
-
-#pulseaudio {
     color: #89b4fa;
+    border-bottom: 3px solid #89b4fa;
 }
 
-#network {
-    color: #a6e3a1;
+#workspaces button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
-#battery {
-    color: #fab387;
+/* --- WINDOW TITLE --- */
+#window {
+    font-weight: normal;
+    color: #bac2de;
 }
 
-#battery.charging {
-    color: #a6e3a1;
+/* --- TRAY (Các icon hệ thống) --- */
+#tray {
+    padding: 0 10px;
 }
 
-#battery.warning {
-    color: #f9e2af;
-}
+#pulseaudio { color: #89b4fa; }
+#network { color: #a6e3a1; }
+#battery { color: #fab387; }
+#clock { color: #cba6f7; }
 
 #battery.critical {
-    color: #f38ba8;
-    animation-name: blink;
-    animation-duration: 0.5s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
-}
-
-@keyframes blink {
-    to {
-        background-color: #f38ba8;
-        color: #181825;
-    }
+    background-color: #f38ba8;
+    color: #1e1e2e;
 }

@@ -1,0 +1,32 @@
+/* Cho cái lịch */
+.widget-label {
+  margin: 10px;
+  padding: 10px;
+  background-color: #313244;
+  border-radius: 10px;
+}
+.widget-label > label {
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 14px;
+}
+
+/* Cho các nút bấm */
+.widget-buttons-grid {
+  padding: 5px;
+  margin: 10px;
+  background-color: #313244;
+  border-radius: 10px;
+}
+
+.widget-buttons-grid > div > button {
+  background: #45475a;
+  border-radius: 8px;
+  margin: 5px;
+  padding: 15px;
+  font-size: 20px; /* To lên cho dễ bấm */
+}
+
+.widget-buttons-grid > div > button:hover {
+  background: #89b4fa;
+  color: #1e1e2e;
+}
