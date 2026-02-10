@@ -1,40 +1,37 @@
-{ pkgs, ... }:
+{pkgs, ...}: {
+  programs.nixvim = {
+    plugins.conform-nvim = {
+      enable = true;
 
-{
-    programs.nixvim = {
-        plugins.conform-nvim = {
-            enable = true;
-
-            settings = {
-                format_on_save = {
-                    lsp_fallback = true; 
-                    timeout_ms = 500;
-                };
-
-                formatters_by_ft = {
-                    python = [ "black" ];
-                    nix = [ "alejandra" ];
-                    "*" = [ "trim_whitespace" ];
-                };
-            };
+      settings = {
+        format_on_save = {
+          lsp_fallback = true;
+          timeout_ms = 500;
         };
 
-        keymaps = [
-            {
-                mode = "n";
-                key = "<leader>cf";
-                action = "<cmd>lua require('conform').format({ lsp_fallback = true })<CR>";
-                options = {
-                    silent = true;
-                    desc = "Format Buffer";
-                };
-            }
-        ];
+        formatters_by_ft = {
+          python = ["black"];
+          nix = ["alejandra"];
+          "*" = ["trim_whitespace"];
+        };
+      };
     };
 
-    home.packages = with pkgs; [
-        alejandra
-        black
-        # rustfmt 
+    keymaps = [
+      {
+        mode = "n";
+        key = "<leader>cf";
+        action = "<cmd>lua require('conform').format({ lsp_fallback = true })<CR>";
+        options = {
+          silent = true;
+          desc = "Format Buffer";
+        };
+      }
     ];
+  };
+
+  home.packages = with pkgs; [
+    alejandra
+    black
+  ];
 }

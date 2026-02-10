@@ -12,20 +12,30 @@
   ];
 
   home.packages = with pkgs; [
+    # System Control
     brightnessctl
+    wl-clipboard
     libnotify
+    swaynotificationcenter
+    polkit_gnome
+
+    # CLI Tools
     bluetuith
     pulsemixer
     ripgrep
-    wlogout
     fd
     jq
+    btop
+
+    # Archives
     p7zip
-    bottom
+
+    # Clipboard & Screenshot
     grim
     slurp
 
     # GUI
     obsidian
+    zed-editor
   ];
 }

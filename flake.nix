@@ -2,18 +2,14 @@
   description = "Nekoma's system";
 
   inputs = {
-    # 1. NixOS 25.11 stable
+    # NixOS 25.11 stable
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
 
-    # 2. Home Manager
+    # Home Manager
     home-manager.url = "github:nix-community/home-manager/release-25.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-    # 3. Rust Overlay (for latest Rust compiler)
-    rust-overlay.url = "github:oxalica/rust-overlay";
-    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
-
-    # 4. Walker App Launcher
+    # Walker App Launcher
     elephant.url = "github:abenz1267/elephant";
     walker = {
       url = "github:abenz1267/walker";
@@ -21,13 +17,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # 5. Nixvim
+    # Nixvim
     nixvim = {
       url = "github:nix-community/nixvim/nixos-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # 6. Firefox
+    # Firefox
     firefox-addons = {
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -38,7 +34,6 @@
     self,
     nixpkgs,
     home-manager,
-    rust-overlay,
     walker,
     nixvim,
     ...
@@ -52,9 +47,6 @@
         modules = [
           ./hosts/astral/default.nix
           ./pkgsConfig.nix
-          {
-            nixpkgs.overlays = [(import rust-overlay)];
-          }
 
           home-manager.nixosModules.home-manager
           {

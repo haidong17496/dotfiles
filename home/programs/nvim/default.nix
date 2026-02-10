@@ -8,10 +8,10 @@
     ./vimOptions.nix
 
     # Plugins
-    ./plugins/autopairs.nix
-    ./plugins/completion.nix
+    #./plugins/autopairs.nix
+    #./plugins/completion.nix
     ./plugins/conform.nix
-    ./plugins/lsp.nix
+    #./plugins/lsp.nix
     ./plugins/neo-tree.nix
     ./plugins/telescope.nix
     ./plugins/treesitter.nix
