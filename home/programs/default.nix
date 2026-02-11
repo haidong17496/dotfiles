@@ -9,6 +9,8 @@
     ./bluetooth.nix
     ./direnv.nix
     ./media.nix
+    ./recorder.nix
+    ./easyEffects.nix
     ./tmux.nix
   ];
 
@@ -19,10 +21,12 @@
     libnotify
     swaynotificationcenter
     polkit_gnome
+    playerctl
 
     # CLI Tools
     bluetuith
     pulsemixer
+    gpu-screen-recorder
     ripgrep
     fd
     jq

@@ -4,6 +4,7 @@
     ./hyprlock.nix
     ./hypridle.nix
     ./hyprsunset.nix
+    ./hyprshot.nix
   ];
 
   wayland.windowManager.hyprland = {

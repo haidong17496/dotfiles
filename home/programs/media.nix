@@ -39,15 +39,29 @@
   # --- VIDEO PLAYER (MPV) ---
   programs.mpv = {
     enable = true;
-    defaultProfiles = ["gpu-hq"];
-    scripts = [pkgs.mpvScripts.mpris];
+    scripts = with pkgs.mpvScripts; [
+      uosc
+      mpris
+      thumbfast
+    ];
 
     config = {
       osc = "no";
+      osd-bar = "no";
       border = "no";
+      cursor-autohide = 1000;
 
-      hwdec = "auto-safe";
       vo = "gpu";
+      gpu-api = "opengl";
+      hwdec = "vaapi";
+
+      video-sync = "display-resample";
+      interpolation = "yes";
+      tscale = "oversample";
+
+      dither-depth = "auto";
+      scale = "bilinear";
+      cscale = "bilinear";
     };
   };
 

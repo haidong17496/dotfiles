@@ -8,7 +8,7 @@
     ./vimOptions.nix
 
     # Plugins
-    #./plugins/autopairs.nix
+    ./plugins/autopairs.nix
     #./plugins/completion.nix
     ./plugins/conform.nix
     #./plugins/lsp.nix
