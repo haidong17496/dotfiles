@@ -42,6 +42,5 @@
     # GUI
     obsidian
     zed-editor
-    thunar
   ];
 }
