@@ -12,11 +12,11 @@
     #./plugins/completion.nix
     ./plugins/conform.nix
     #./plugins/lsp.nix
-    ./plugins/neo-tree.nix
+    ./plugins/neotree.nix
     ./plugins/telescope.nix
     ./plugins/treesitter.nix
     ./plugins/flash.nix
-    ./plugins/which-key.nix
+    ./plugins/whichkey.nix
     ./plugins/markview.nix
   ];
 

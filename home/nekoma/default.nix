@@ -4,12 +4,12 @@
   ...
 }: {
   imports = [
-    ./guiApp.nix
     ./hyprland
     ./launcher
     ./browser
     ./statusbar
     ./editor/nvim
+    ./guiApps.nix
     ./terminal.nix
     ./theme.nix
     ./direnv.nix
@@ -18,6 +18,9 @@
     ./media.nix
     ./recorder.nix
     ./yazi.nix
+
+    # --- Home Modules ---
+    ../../modules/home/blueprint/x555uj.nix
   ];
 
   home.username = "nekoma";

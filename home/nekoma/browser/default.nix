@@ -7,11 +7,11 @@
     # --- SEARCH ENGINES (User Specific) ---
     search = {
       force = true;
-      default = "Google";
+      default = "google";
       engines = {
         "ArchWiki" = {
           urls = [{template = "https://wiki.archlinux.org/index.php?search={searchTerms}";}];
-          iconUpdateURL = "https://wiki.archlinux.org/favicon.ico";
+          icon = "https://wiki.archlinux.org/favicon.ico";
           updateInterval = 24 * 60 * 60 * 1000; # Update every day
           definedAliases = ["!aw"];
         };
@@ -36,7 +36,7 @@
           definedAliases = ["!nix"];
         };
 
-        "YouTube" = {
+        "youTube" = {
           urls = [{template = "https://www.youtube.com/results?search_query={searchTerms}";}];
           definedAliases = ["!yt"];
         };

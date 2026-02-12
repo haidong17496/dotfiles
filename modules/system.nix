@@ -24,6 +24,7 @@
   # --- Core System Packages ---
   # Packages that should be available on EVERY hosts
   environment.systemPackages = with pkgs; [
+    nh
     git
     wget
     curl

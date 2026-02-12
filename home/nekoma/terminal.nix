@@ -1,4 +1,4 @@
-{...}: {
+{pkgs, ...}: {
   # Terminal
   programs.alacritty.settings = {
     window = {

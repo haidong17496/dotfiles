@@ -1,5 +1,5 @@
 {pkgs, ...}: let
-  wallpaper = ./../../images/wallpaper.png;
+  wallpaper = ./../../../images/wallpaper.png;
 in {
   services.hyprpaper = {
     enable = true;

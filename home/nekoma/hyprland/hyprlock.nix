@@ -1,5 +1,5 @@
 {pkgs, ...}: let
-  wallpaper = ../../../images/wallpaper.png;
+  wallpaper = ./../../../images/wallpaper.png;
   font_family = "JetBrainsMono Nerd Font";
 
   # --- LAYOUT CONSTANTS ---

@@ -51,7 +51,6 @@
   environment.systemPackages = with pkgs; [
     libsForQt5.qt5.qtwayland
     kdePackages.qtwayland
-    polkit_gnome
   ];
 
   # Systemd service for Polkit Agent

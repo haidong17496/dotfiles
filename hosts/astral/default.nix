@@ -16,14 +16,11 @@
     ../../modules/i18n.nix
     ../../modules/greeters/ly.nix
 
-    # --- Home Modules ---
-    ../../modules/home/blueprint/x555uj.nix
-
     # --- Hardware Specific (Nvidia 920M) ---
     ../../modules/nvidia/legacy470.nix
 
     # --- Window Manager ---
-    ../../modules/wm/hyprland/
+    ../../modules/wm/hyprland
   ];
 
   # --- Networking ---

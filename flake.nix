@@ -53,7 +53,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = {inherit inputs;};
-            home-manager.users.nekoma = import ./home/default.nix;
+            home-manager.users.nekoma = import ./home/nekoma/default.nix;
           }
         ];
       };
