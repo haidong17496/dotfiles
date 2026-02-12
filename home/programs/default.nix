@@ -3,7 +3,6 @@
     ./swaync
     ./nvim
     ./browser
-    ./waybar
     ./git.nix
     ./yazi.nix
     ./bluetooth.nix
@@ -21,16 +20,17 @@
     libnotify
     swaynotificationcenter
     polkit_gnome
-    playerctl
 
     # CLI Tools
     bluetuith
     pulsemixer
     gpu-screen-recorder
+    ffmpeg
     ripgrep
     fd
     jq
     bottom
+    dragon-drop
 
     # Archives
     p7zip
@@ -42,5 +42,6 @@
     # GUI
     obsidian
     zed-editor
+    thunar
   ];
 }

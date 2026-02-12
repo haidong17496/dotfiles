@@ -4,10 +4,11 @@
   ...
 }: {
   imports = [
-    ./hyprland/default.nix
-    ./walker/default.nix
-    ./shell/default.nix
-    ./programs/default.nix
+    ./hyprland
+    ./walker
+    ./shell
+    ./waybar
+    ./programs
   ];
 
   home.packages = with pkgs; [
@@ -21,18 +22,16 @@
       package = pkgs.papirus-icon-theme;
     };
     theme = {
-      name = "Catppuccin-Mocha-Standard-Blue-Dark";
-      package = pkgs.catppuccin-gtk.override {
-        accents = ["blue"];
-        size = "standard";
-        tweaks = ["rimless"];
-        variant = "mocha";
-      };
+      name = "Adwaita-dark";
+      package = pkgs.gnome-themes-extra;
     };
     cursorTheme = {
       name = "Bibata-Modern-Ice";
       package = pkgs.bibata-cursors;
     };
+
+    gtk3.extraConfig.gtk-application-prefer-dark-theme = 1;
+    gtk4.extraConfig.gtk-application-prefer-dark-theme = 1;
   };
 
   home.pointerCursor = {

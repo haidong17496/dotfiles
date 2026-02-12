@@ -1,30 +1,35 @@
 {pkgs, ...}: let
   screen-record = pkgs.writeShellScriptBin "screen-record" ''
-    if pgrep -x "gpu-screen-recorder" > /dev/null; then
-        # Stop recording safely
-        pkill -INT gpu-screen-recorder
-        notify-send "Recorder" "Recording saved." -i video-display -a "System"
+    if pgrep -f "gpu-screen-recorder" > /dev/null; then
+        pkill -INT -f "gpu-screen-recorder"
     else
-        # Setup directory
         RECORD_DIR="$HOME/Videos/recordings"
         mkdir -p "$RECORD_DIR"
-        FILEPATH="$RECORD_DIR/rec_$(date +%Y%m%d_%H%M%S).mp4"
+        TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+        TEMP_FILE="$RECORD_DIR/temp_$TIMESTAMP.mp4"
+        FINAL_FILE="$RECORD_DIR/rec_$TIMESTAMP.mp4"
 
-        notify-send "Recorder" "Select region to start..." -i video-display -a "System"
+        notify-send "Recorder" "Recording started (Auto-Mix Audio)" -i video-display -a "System"
 
-        # -w portal: Select window/region using Hyprland native picker
-        # -f 30: 30FPS (Stable for i5-6200U)
-        # -a default_output: System Sound
-        # -a default_input: Raw Mic
-        # No extra quality flags -> Let the tool decide the best defaults
-        gpu-screen-recorder \
-          -w portal \
-          -f 30 \
-          -a default_output \
-          -a default_input \
-          -o "$FILEPATH" &
+        (
+            gpu-screen-recorder \
+              -w portal \
+              -f 30 \
+              -a default_output \
+              -a default_input \
+              -o "$TEMP_FILE"
 
-        notify-send "Recorder" "Recording started!" -i video-display -a "System"
+            notify-send "Recorder" "Processing audio..." -i video-display -a "System"
+
+            ${pkgs.ffmpeg}/bin/ffmpeg -i "$TEMP_FILE" \
+              -filter_complex "[0:a:0][0:a:1]amix=inputs=2:duration=longest[a]" \
+              -map 0:v -map "[a]" \
+              -c:v copy -c:a aac \
+              "$FINAL_FILE"
+
+            rm "$TEMP_FILE"
+            notify-send "Recorder" "Recording saved & mixed!" -i video-display -a "System"
+        ) &
     fi
   '';
 in {
