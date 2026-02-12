@@ -27,8 +27,9 @@
     git
     wget
     curl
-    bottom
-    p7zip
+    unzip
     killall
+    polkit_gnome
+    brightnessctl
   ];
 }

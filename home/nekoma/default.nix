@@ -1,19 +1,27 @@
 {
   config,
   pkgs,
-  inputs,
   ...
 }: {
   imports = [
-    ./caelestia.nix
-    ./packages.nix
+    ./guiApp.nix
+    ./hyprland
+    ./launcher
+    ./browser
+    ./statusbar
+    ./editor/nvim
+    ./terminal.nix
+    ./theme.nix
+    ./direnv.nix
+    ./easyeffects.nix
+    ./git.nix
+    ./media.nix
+    ./recorder.nix
+    ./yazi.nix
   ];
 
-  home = {
-    username = "nekoma";
-    homeDirectory = "/home/nekoma";
-    stateVersion = "25.11";
-  };
+  home.username = "nekoma";
+  home.homeDirectory = "/home/nekoma";
 
-  programs.home-manager.enable = true;
+  home.stateVersion = "25.11";
 }

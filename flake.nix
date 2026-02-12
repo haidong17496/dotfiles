@@ -1,23 +1,31 @@
 {
-  description = "Caelestia Rice on NixOS (Unstable)";
+  description = "Nekoma's system";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    home-manager = {
-      url = "github:nix-community/home-manager";
+    # NixOS 25.11 stable
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+
+    # Home Manager
+    home-manager.url = "github:nix-community/home-manager/release-25.11";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
+    # Walker App Launcher
+    elephant.url = "github:abenz1267/elephant";
+    walker = {
+      url = "github:abenz1267/walker";
+      inputs.elephant.follows = "elephant";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # --- Caelestia Components ---
-    # Shell: The UI (Bar, Launcher, OSD) built with Quickshell (Qt/QML)
-    caelestia-shell = {
-      url = "github:caelestia-dots/shell";
+    # Nixvim
+    nixvim = {
+      url = "github:nix-community/nixvim/nixos-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # CLI: The Logic (Wallpaper handling, colorscheme generation, daemon)
-    caelestia-cli = {
-      url = "github:caelestia-dots/cli";
+    # Firefox
+    firefox-addons = {
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -26,6 +34,8 @@
     self,
     nixpkgs,
     home-manager,
+    walker,
+    nixvim,
     ...
   } @ inputs: let
     system = "x86_64-linux";
@@ -34,25 +44,16 @@
       astral = nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = {inherit inputs;};
-
         modules = [
           ./hosts/astral/default.nix
           ./pkgsConfig.nix
 
-          # Home Manager Integration
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-
-            # Pass inputs to Home Manager modules specifically
             home-manager.extraSpecialArgs = {inherit inputs;};
-
-            # User Configuration
-            home-manager.users.nekoma = import ./home/nekoma/default.nix;
-
-            # Safety: Backup existing files instead of erroring out if collision occurs
-            home-manager.backupFileExtension = "backup";
+            home-manager.users.nekoma = import ./home/default.nix;
           }
         ];
       };

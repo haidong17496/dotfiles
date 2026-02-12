@@ -14,13 +14,16 @@
     ../../modules/audio.nix
     ../../modules/bluetooth.nix
     ../../modules/i18n.nix
-    ../../modules/greeters/sddm.nix
+    ../../modules/greeters/ly.nix
+
+    # --- Home Modules ---
+    ../../modules/home/blueprint/x555uj.nix
 
     # --- Hardware Specific (Nvidia 920M) ---
     ../../modules/nvidia/legacy470.nix
 
     # --- Window Manager ---
-    ../../modules/wm/hyprland/default.nix
+    ../../modules/wm/hyprland/
   ];
 
   # --- Networking ---
@@ -31,15 +34,15 @@
     isNormalUser = true;
     description = "Nekoma";
     extraGroups = ["networkmanager" "wheel" "video" "input" "audio"];
-
-    # Setting Zsh as the default shell for this user on this host
-    #shell = pkgs.zsh;
+    shell = pkgs.zsh;
   };
 
-  # --- Host Specific Packages ---
-  environment.systemPackages = with pkgs; [
-    zsh
+  # --- External Storage ---
+  systemd.tmpfiles.rules = [
+    "d /mnt/backup 0755 nekoma users -"
   ];
+
+  programs.zsh.enable = true;
 
   # --- System State ---
   system.stateVersion = "25.11";
