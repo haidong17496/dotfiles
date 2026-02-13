@@ -2,11 +2,12 @@
   # Terminal
   programs.alacritty.settings = {
     window = {
-      opacity = 0.9;
       padding = {
+        x = 8;
         y = 8;
       };
       dynamic_padding = true;
+      decorations = "None";
     };
     colors = {
       primary = {

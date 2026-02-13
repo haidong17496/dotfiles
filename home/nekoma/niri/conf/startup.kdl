@@ -1,0 +1,14 @@
+// ============================================================================
+// STARTUP
+// ============================================================================
+
+hotkey-overlay {
+    skip-at-startup
+}
+
+spawn-at-startup "ironbar"
+spawn-at-startup "swaybg" "-i" "/home/nekoma/dotfiles/images/wallpaper.png" "-m" "fill"
+spawn-at-startup "swaync"
+spawn-at-startup "fcitx5" "-d" "--replace"
+
+

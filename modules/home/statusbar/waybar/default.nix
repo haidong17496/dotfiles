@@ -1,5 +1,7 @@
 {pkgs, ...}: {
   programs.waybar = {
+    enable = true;
+    systemd.enable = true;
     style = ./style.css;
 
     settings = {
@@ -12,7 +14,10 @@
         gtk-layer-shell = true;
         height = 32;
 
-        modules-left = ["hyprland/workspaces" "hyprland/window"];
+        # Hyprland
+        # modules-left = ["hyprland/workspaces" "hyprland/window"];
+        # Niri
+        modules-left = ["niri/workspaces" "niri/window"];
         modules-center = ["clock" "custom/notification"];
         modules-right = ["tray" "pulseaudio" "network" "battery"];
 
@@ -37,6 +42,7 @@
           escape = true;
         };
 
+        /*
         "hyprland/workspaces" = {
           disable-scroll = true;
           all-outputs = false;
@@ -45,6 +51,22 @@
         };
 
         "hyprland/window" = {
+          format = "{title}";
+          max-length = 35;
+          separate-outputs = true;
+        };
+        */
+
+        # --- Niri ---
+        "niri/workspaces" = {
+          format = "{icon}";
+          format-icons = {
+            active = "";
+            default = "";
+          };
+        };
+
+        "niri/window" = {
           format = "{title}";
           max-length = 35;
           separate-outputs = true;

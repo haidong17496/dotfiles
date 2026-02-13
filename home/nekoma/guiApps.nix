@@ -3,4 +3,8 @@
     obsidian
     zed-editor
   ];
+
+  services.easyeffects = {
+    enable = true;
+  };
 }

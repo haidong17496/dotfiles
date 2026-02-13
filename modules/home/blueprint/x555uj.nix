@@ -4,7 +4,7 @@
     ../launcher/walker.nix
     ../prompt/starship.nix
     ../shell/zsh.nix
-    ../statusbar/waybar.nix
+    ../statusbar/waybar
     ../terminal/alacritty.nix
     ../theme/gtk.nix
     ../theme/presets/adwaita-dark.nix

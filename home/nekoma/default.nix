@@ -4,20 +4,20 @@
   ...
 }: {
   imports = [
-    ./hyprland
+    #./hyprland
+    ./niri
     ./launcher
     ./browser
-    ./statusbar
     ./service/swaync
     ./editor/nvim
     ./guiApps.nix
     ./terminal.nix
     ./theme.nix
     ./direnv.nix
-    ./easyeffects.nix
     ./git.nix
     ./media.nix
     ./recorder.nix
+    ./nirishot.nix
     ./yazi.nix
 
     # --- Home Modules ---

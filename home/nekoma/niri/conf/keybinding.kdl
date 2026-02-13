@@ -1,0 +1,79 @@
+// ============================================================================
+// KEYBINDING
+// ============================================================================
+
+binds {
+    // --- APPS ---
+    "Mod+Return" { spawn "alacritty"; }
+    "Mod+E" { spawn "alacritty" "-e" "yazi"; }
+    "Mod+Space" { spawn "walker"; }
+    "Mod+F" { spawn "firefox"; }
+    "Mod+N" { spawn "swaync-client" "-t" "-sw"; }
+
+    // --- WINDOW MANAGEMENT ---
+    "Mod+Q" { close-window; }
+    "Mod+V" { toggle-window-floating; }
+    "Mod+F11" { fullscreen-window; }
+    "Mod+Shift+F" { maximize-column; }
+    "Ctrl+Tab" { toggle-overview; }
+
+    // --- MOVING (H-J-K-L) ---
+    "Mod+H" { focus-column-left; }
+    "Mod+L" { focus-column-right; }
+    "Mod+K" { focus-window-up; }
+    "Mod+J" { focus-window-down; }
+
+    "Mod+Shift+H" { move-column-left; }
+    "Mod+Shift+L" { move-column-right; }
+    "Mod+Shift+K" { move-window-up; }
+    "Mod+Shift+J" { move-window-down; }
+
+    // --- FOCUS MONITOR
+    "Mod+Comma" { focus-monitor-previous; }
+    "Mod+Period" { focus-monitor-next; }
+
+    // --- SCROLLING ---
+    "Mod+Home" { focus-column-first; }
+    "Mod+End"  { focus-column-last; }
+
+    // --- RESIZE ---
+    "Alt+H" { set-column-width "-10%"; }
+    "Alt+L" { set-column-width "+10%"; }
+    "Alt+K" { set-window-height "-10%"; }
+    "Alt+J" { set-window-height "+10%"; }
+
+    // --- WORKSPACES ---
+    "Mod+1" { focus-workspace 1; }
+    "Mod+2" { focus-workspace 2; }
+    "Mod+3" { focus-workspace 3; }
+    "Mod+4" { focus-workspace 4; }
+    "Mod+5" { focus-workspace 5; }
+
+    "Mod+Shift+1" { move-column-to-workspace 1; }
+    "Mod+Shift+2" { move-column-to-workspace 2; }
+    "Mod+Shift+3" { move-column-to-workspace 3; }
+    "Mod+Shift+4" { move-column-to-workspace 4; }
+    "Mod+Shift+5" { move-column-to-workspace 5; }
+
+    // --- POWER & SYSTEM ---
+    "Mod+Ctrl+Alt+P" { spawn "systemctl" "poweroff"; }
+    "Mod+Ctrl+Alt+O" { spawn "systemctl" "reboot"; }
+    "Mod+M" { quit; }
+
+    // --- SCREENSHOT & RECORD ---
+    Print { spawn "nirishot" "-m" "region"; }
+    Shift+Print { spawn "nirishot" "-m" "region" "--clipboard-only"; }
+    Ctrl+Print { spawn "nirishot" "-m" "window"; }
+
+    "Pause" { spawn "screen-record"; }
+    "Scroll_Lock" { spawn "toggle-hyprsunset"; }
+
+    // --- MEDIA KEYS ---
+    "XF86AudioRaiseVolume" allow-when-locked=true { spawn "wpctl" "set-volume" "-l" "1" "@DEFAULT_AUDIO_SINK@" "5%+"; }
+    "XF86AudioLowerVolume" allow-when-locked=true { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "5%-"; }
+    "XF86AudioMute"        allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
+    "XF86MonBrightnessUp"   allow-when-locked=true { spawn "brightnessctl" "s" "10%+"; }
+    "XF86MonBrightnessDown" allow-when-locked=true { spawn "brightnessctl" "s" "10%-"; }
+}
+
+

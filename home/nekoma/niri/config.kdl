@@ -1,0 +1,12 @@
+// ============================================================================
+// Config.kdl
+// ============================================================================
+
+include "./conf/env.kdl"
+include "./conf/window.kdl"
+include "./conf/input.kdl"
+include "./conf/monitor.kdl"
+include "./conf/startup.kdl"
+include "./conf/layout.kdl"
+include "./conf/animation.kdl"
+include "./conf/keybinding.kdl"

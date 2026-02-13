@@ -6,6 +6,15 @@
     gnome-themes-extra
   ];
 
+  dconf = {
+    enable = true;
+    settings = {
+      "org/gnome/desktop/interface" = {
+        color-scheme = "prefer-dark";
+      };
+    };
+  };
+
   # GTK Theme & Icons content
   gtk = {
     iconTheme = {
@@ -14,7 +23,7 @@
     };
 
     theme = {
-      name = "Adwaita-dark";
+      name = "Adwaita";
       package = pkgs.gnome-themes-extra;
     };
 
