@@ -14,7 +14,7 @@
     ../../modules/audio.nix
     ../../modules/bluetooth.nix
     ../../modules/i18n.nix
-    ../../modules/greeters/ly.nix
+    ../../modules/greeters/tuigreet.nix
 
     # --- Hardware Specific (Nvidia 920M) ---
     ../../modules/nvidia/legacy470.nix

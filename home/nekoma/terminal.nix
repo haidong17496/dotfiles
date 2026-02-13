@@ -4,8 +4,14 @@
     window = {
       opacity = 0.9;
       padding = {
-        x = 8;
         y = 8;
+      };
+      dynamic_padding = true;
+    };
+    colors = {
+      primary = {
+        background = "#1e1e2e";
+        foreground = "#cdd6f4";
       };
     };
     font = {

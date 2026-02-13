@@ -8,6 +8,7 @@
     ./launcher
     ./browser
     ./statusbar
+    ./service/swaync
     ./editor/nvim
     ./guiApps.nix
     ./terminal.nix

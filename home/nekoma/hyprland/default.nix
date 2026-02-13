@@ -25,7 +25,6 @@
   home.packages = with pkgs; [
     wl-clipboard
     libnotify
-    swaynotificationcenter
     grim
     slurp
   ];
