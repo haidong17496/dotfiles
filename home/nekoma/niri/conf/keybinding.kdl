@@ -58,6 +58,7 @@ binds {
     // --- POWER & SYSTEM ---
     "Mod+Ctrl+Alt+P" { spawn "systemctl" "poweroff"; }
     "Mod+Ctrl+Alt+O" { spawn "systemctl" "reboot"; }
+    "Mod+Ctrl+Alt+I" { spawn "loginctl" "lock-session"; }
     "Mod+M" { quit; }
 
     // --- SCREENSHOT & RECORD ---
@@ -74,6 +75,9 @@ binds {
     "XF86AudioMute"        allow-when-locked=true { spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle"; }
     "XF86MonBrightnessUp"   allow-when-locked=true { spawn "brightnessctl" "s" "10%+"; }
     "XF86MonBrightnessDown" allow-when-locked=true { spawn "brightnessctl" "s" "10%-"; }
+
+    // Locking Screen
+
 }
 
 

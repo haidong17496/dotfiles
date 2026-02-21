@@ -3,6 +3,10 @@
   pkgs,
   ...
 }: {
+  imports = [
+    ./hypridle.nix
+    ./hyprlock.nix
+  ];
   home.packages = with pkgs; [
     wl-clipboard
     libnotify
